@@ -1,3 +1,5 @@
+using DataLayer.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebAPI
 {
@@ -7,7 +9,8 @@ namespace WebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            string connStr = builder.Configuration.GetConnectionString("LocalDb");
+            builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connStr));
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
