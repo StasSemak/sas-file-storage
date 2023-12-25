@@ -21,7 +21,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var res = await service.UploadFile(model);
+                var res = await service.UploadFileAsync(model);
                 return Ok(res);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                await service.DeleteFile(model);
+                await service.DeleteFileAsync(model);
                 return Ok();    
             }
             catch (Exception ex)

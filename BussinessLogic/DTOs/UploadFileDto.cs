@@ -9,6 +9,7 @@ namespace BussinessLogic.DTOs
     public class UploadFileDto
     {
         public string Base64 { get; set; }
+        public string FileName { get; set; }
         public string UserId { get; set; }
         public string SecurityKey { get; set; }
     }

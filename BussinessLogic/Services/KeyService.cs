@@ -14,10 +14,14 @@ namespace BussinessLogic.Services
 
         public KeyService() 
         {
-            keysFolderPath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory().ToString()).FullName, "Keys");
+            if(Constants.IsDevelopment)
+            {
+                keysFolderPath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory().ToString()).FullName, "Keys");
+            }
+            else keysFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Keys");
         }
 
-        public async Task<bool> IsSecurityKeyValid(string key)
+        public async Task<bool> IsSecurityKeyValidAsync(string key)
         {
             StreamReader reader = new StreamReader(Path.Combine(keysFolderPath, "SecurityKeyHash.txt"));
             string storedKey = await reader.ReadToEndAsync();
@@ -26,7 +30,7 @@ namespace BussinessLogic.Services
             return passedKey == storedKey;
         }
 
-        public async Task<bool> IsAdminKeyValid(string key)
+        public async Task<bool> IsAdminKeyValidAsync(string key)
         {
             StreamReader reader = new StreamReader(Path.Combine(keysFolderPath, "AdminKeyHash.txt"));
             string storedKey = await reader.ReadToEndAsync();

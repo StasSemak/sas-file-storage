@@ -8,7 +8,7 @@ namespace BussinessLogic.Interfaces
 {
     public interface IKeyService
     {
-        Task<bool> IsSecurityKeyValid(string key);
-        Task<bool> IsAdminKeyValid(string key);
+        Task<bool> IsSecurityKeyValidAsync(string key);
+        Task<bool> IsAdminKeyValidAsync(string key);
     }
 }

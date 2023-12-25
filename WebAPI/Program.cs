@@ -20,9 +20,9 @@ namespace WebAPI
             if (builder.Environment.IsDevelopment())
             {
                 dir = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory().ToString()).FullName,
-                    "BussinessLogic", "Images");
+                    "BussinessLogic", "Files");
             }
-            else dir = Path.Combine(Directory.GetCurrentDirectory(), "Images");
+            else dir = Path.Combine(Directory.GetCurrentDirectory(), "Files");
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);

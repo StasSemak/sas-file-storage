@@ -12,10 +12,14 @@ namespace BussinessLogic.Services
         private readonly string logFilePath;
         public LoggerService() 
         {
-            logFilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory().ToString()).FullName, "Logs.log");
+            if (Constants.IsDevelopment)
+            {
+                logFilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory().ToString()).FullName, "logs.txt");
+            }
+            else logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "logs.txt");
         }
 
-        public async Task LogSuccess(string userId, string fileName)
+        public async Task LogSuccessAsync(string userId, string fileName)
         { 
             StreamWriter writer = new StreamWriter(logFilePath);
             string message = $"{DateTime.UtcNow}\tFile {fileName} is uploaded by user {userId}.";
@@ -23,7 +27,7 @@ namespace BussinessLogic.Services
             writer.Close();
         }
 
-        public async Task LogError(string userId, string errorMessage)
+        public async Task LogErrorAsync(string userId, string errorMessage)
         {
             StreamWriter writer = new StreamWriter(logFilePath);
             string message = $"{DateTime.UtcNow}\tERROR! {errorMessage}. User: {userId}.";

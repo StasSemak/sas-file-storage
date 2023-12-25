@@ -9,7 +9,7 @@ namespace BussinessLogic.Interfaces
 {
     public interface IFileService
     {
-        Task<string> UploadFile(UploadFileDto model);
-        Task DeleteFile(DeleteFileDto model);
+        Task<string> UploadFileAsync(UploadFileDto model);
+        Task DeleteFileAsync(DeleteFileDto model);
     }
 }
