@@ -1,4 +1,5 @@
-﻿using BussinessLogic.DTOs;
+﻿using AutoMapper;
+using BussinessLogic.DTOs;
 using BussinessLogic.Helpers;
 using BussinessLogic.Interfaces;
 using DataLayer.Data;
@@ -18,13 +19,16 @@ namespace BussinessLogic.Services
         private readonly IKeyService keyService;
         private readonly ILoggerService loggerService;
         private readonly FilesWorker filesWorker;
+        private readonly IMapper mapper;
 
-        public FileService(AppDbContext context, IKeyService keyService, ILoggerService loggerService, FilesWorker filesWorker)
+        public FileService(AppDbContext context, IKeyService keyService, ILoggerService loggerService, 
+            FilesWorker filesWorker, IMapper mapper)
         {
             this.context = context;
             this.keyService = keyService;
             this.loggerService = loggerService;
             this.filesWorker = filesWorker;
+            this.mapper = mapper;
         }
 
         public async Task<string> UploadFileAsync(UploadFileDto model)
@@ -101,6 +105,66 @@ namespace BussinessLogic.Services
                 await loggerService.LogErrorAsync((string.IsNullOrWhiteSpace(model.AdminKey) ? model.UserId : "ADMIN"), ex.Message);
                 throw;
             }
+        }
+
+        public async Task<FileInfoDto> GetFileInfoByIdAsync(string id, string key)
+        {
+            if(!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+
+            var storage = await context.Storages.FindAsync(id);
+            if (storage == null) throw new Exception($"Not found file with id ${id}!");
+
+            return new FileInfoDto
+            {
+                Id = storage.Id,
+                FileName = storage.FileName,
+                CreatedAt = storage.CreatedAt,
+                MimeType = storage.MimeType,
+                UserId = storage.UserId
+            };
+        }
+
+        public async Task<FileInfoDto> GetFileInfoByNameAsync(string name, string key)
+        {
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+
+            var storage = await context.Storages
+                .Where(x => x.FileName == name)
+                .SingleOrDefaultAsync();
+            if (storage == null) throw new Exception($"Not found file with name ${name}!");
+
+            return mapper.Map<FileInfoDto>(storage);   
+        }
+
+        public async Task<ICollection<FileInfoDto>> GetAllAsync(string key)
+        {
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+
+            var storages = await context.Storages.ToListAsync();
+
+            return mapper.Map<ICollection<FileInfoDto>>(storages);
+        }
+
+        public async Task<ICollection<FileInfoDto>> GetByUserAsync(string userId, string key)
+        {
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+
+            var storages = await context.Storages
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            return mapper.Map<ICollection<FileInfoDto>>(storages);
+        }
+
+        public async Task<ICollection<FileInfoDto>> GetByMimeAsync(string type, string key)
+        {
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+
+            var storages = await context.Storages
+                .Where(x => x.MimeType == type)
+                .ToListAsync();
+
+            return mapper.Map<ICollection<FileInfoDto>>(storages);
         }
     }
 }
