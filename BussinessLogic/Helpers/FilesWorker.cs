@@ -19,9 +19,10 @@ namespace BussinessLogic.Helpers
             if (string.IsNullOrWhiteSpace(base64)) throw new Exception("Unable to convert empty string!");
 
             string fileExtension = filename.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+            string base64Prefix = base64.Split(',')[0];
             string savedFileName = Path.GetRandomFileName() + $".{fileExtension}";
 
-            if(IsImage(fileExtension))
+            if(base64Prefix.Contains("image"))
             {
                 try
                 {
@@ -49,12 +50,6 @@ namespace BussinessLogic.Helpers
             }
 
             return savedFileName;
-        }
-
-        private bool IsImage(string fileExtension)
-        {
-            string[] imageExtensions = { "jpeg", "png", "jpg", "ico", "webp", "bmp", "gif", "tiff" };
-            return imageExtensions.Contains(fileExtension);
         }
 
         public void RemoveFile(string filename)
