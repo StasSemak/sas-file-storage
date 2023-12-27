@@ -19,10 +19,10 @@ namespace BussinessLogic.Services
             else logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "logs.txt");
         }
 
-        public async Task LogSuccessAsync(string userId, string fileName)
+        public async Task LogSuccessAsync(string userId, string fileName, bool isUpload = true)
         { 
             StreamWriter writer = new StreamWriter(logFilePath);
-            string message = $"{DateTime.UtcNow}\tFile {fileName} is uploaded by user {userId}.";
+            string message = $"{DateTime.UtcNow}\tFile {fileName} is {(isUpload ? "uploaded" : "deleted")} by user {userId}.";
             await writer.WriteLineAsync(message);
             writer.Close();
         }

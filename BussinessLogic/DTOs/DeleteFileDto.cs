@@ -10,5 +10,7 @@ namespace BussinessLogic.DTOs
     {
         public string FileName { get; set; }
         public string SecurityKey { get; set; }
+        public string AdminKey { get; set; }
+        public string UserId { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace BussinessLogic.Interfaces
 {
     public interface ILoggerService
     {
-        Task LogSuccessAsync(string userId, string fileName);
+        Task LogSuccessAsync(string userId, string fileName, bool isUpload = true);
         Task LogErrorAsync(string userId, string errorMessage);
     }
 }
