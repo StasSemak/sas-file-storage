@@ -52,20 +52,23 @@ namespace BussinessLogic.Helpers
             return savedFileName;
         }
 
-        public void RemoveFile(string filename)
+        public async Task RemoveFileAsync(string filename)
         {
-            try
+            return Task.Run(() =>
             {
-                string file = Path.Combine(filesFolder, filename);
-                if (File.Exists(file))
+                try
                 {
-                    File.Delete(file);
+                    string file = Path.Combine(filesFolder, filename);
+                    if (File.Exists(file))
+                    {
+                        File.Delete(file);
+                    }
                 }
-            }
-            catch
-            {
-                throw new Exception($"Error removing file {filename}!");
-            }
+                catch
+                {
+                    throw new Exception($"Error removing file {filename}!");
+                }
+            });
         }
     }
 }
