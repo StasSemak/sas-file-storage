@@ -24,14 +24,22 @@ namespace DataLayer.Data
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<Storage>()
+            builder.Entity<Upload>()
                 .Property(x => x.Id)
                 .HasValueGenerator<GuidGenerator>();
-            builder.Entity<Storage>()
+            builder.Entity<Upload>()
                 .Property(x => x.CreatedAt)
+                .HasValueGenerator<DateGenerator>();
+
+            builder.Entity<Log>()
+                .Property(x => x.Id)
+                .HasValueGenerator<GuidGenerator>();
+            builder.Entity<Log>()
+                .Property(x => x.Date)
                 .HasValueGenerator<DateGenerator>();
         }
 
-        public DbSet<Storage> Storages { get; set; }
+        public DbSet<Upload> Uploads { get; set; }
+        public DbSet<Log> Logs { get; set; }
     }
 }

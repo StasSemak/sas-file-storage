@@ -18,17 +18,17 @@ namespace BussinessLogic.Services
         private readonly AppDbContext context;
         private readonly IKeyService keyService;
         private readonly ILoggerService loggerService;
-        private readonly FilesWorker filesWorker;
         private readonly IMapper mapper;
+        private readonly IStorageService storageService;
 
         public FileService(AppDbContext context, IKeyService keyService, ILoggerService loggerService, 
-            FilesWorker filesWorker, IMapper mapper)
+            IMapper mapper, IStorageService storageService)
         {
             this.context = context;
             this.keyService = keyService;
             this.loggerService = loggerService;
-            this.filesWorker = filesWorker;
             this.mapper = mapper;
+            this.storageService = storageService;
         }
 
         public async Task<string> UploadFileAsync(UploadFileDto model)
@@ -40,14 +40,14 @@ namespace BussinessLogic.Services
                     throw new UnauthorizedAccessException();
                 }
 
-                string filename = await filesWorker.SaveFileAsync(model.FileName, model.Base64);
+                string filename = await storageService.SaveFileAsync(model.FileName, model.Base64);
 
-                var storage = new Storage();
+                var storage = new Upload();
                 storage.FileName = filename;
                 storage.UserId = model.UserId;
                 storage.MimeType = model.FileName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
 
-                await context.Storages.AddAsync(storage);
+                await context.Uploads.AddAsync(storage);
 
                 await loggerService.LogSuccessAsync(model.UserId, filename);
 
@@ -68,14 +68,14 @@ namespace BussinessLogic.Services
                 {
                     if(!await keyService.IsSecurityKeyValidAsync(model.SecurityKey)) throw new UnauthorizedAccessException();
 
-                    var storage = await context.Storages
+                    var storage = await context.Uploads
                         .Where(x => x.UserId == model.UserId)
                         .Where(x => x.FileName == model.FileName)
                         .SingleOrDefaultAsync();
                     if (storage == null) throw new Exception($"File ${model.FileName} not found!");
 
-                    await filesWorker.RemoveFileAsync(model.FileName);
-                    context.Storages.Remove(storage);
+                    await storageService.RemoveFileAsync(model.FileName);
+                    context.Uploads.Remove(storage);
                     await context.SaveChangesAsync();
 
                     await loggerService.LogSuccessAsync(model.UserId, model.FileName, false);
@@ -84,13 +84,13 @@ namespace BussinessLogic.Services
                 {
                     if (!await keyService.IsAdminKeyValidAsync(model.AdminKey)) throw new UnauthorizedAccessException();
 
-                    var storage = await context.Storages
+                    var storage = await context.Uploads
                         .Where(x => x.FileName == model.FileName)
                         .SingleOrDefaultAsync();
                     if (storage == null) throw new Exception($"File ${model.FileName} not found!");
 
-                    await filesWorker.RemoveFileAsync(model.FileName);
-                    context.Storages.Remove(storage);
+                    await storageService.RemoveFileAsync(model.FileName);
+                    context.Uploads.Remove(storage);
                     await context.SaveChangesAsync();
 
                     await loggerService.LogSuccessAsync("ADMIN", model.FileName, false);
@@ -107,14 +107,14 @@ namespace BussinessLogic.Services
             }
         }
 
-        public async Task<FileInfoDto> GetFileInfoByIdAsync(string id, string key)
+        public async Task<UploadDto> GetUploadByIdAsync(string id, string key)
         {
             if(!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
 
-            var storage = await context.Storages.FindAsync(id);
+            var storage = await context.Uploads.FindAsync(id);
             if (storage == null) throw new Exception($"Not found file with id ${id}!");
 
-            return new FileInfoDto
+            return new UploadDto
             {
                 Id = storage.Id,
                 FileName = storage.FileName,
@@ -124,47 +124,47 @@ namespace BussinessLogic.Services
             };
         }
 
-        public async Task<FileInfoDto> GetFileInfoByNameAsync(string name, string key)
+        public async Task<UploadDto> GetUploadByNameAsync(string name, string key)
         {
             if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
 
-            var storage = await context.Storages
+            var storage = await context.Uploads
                 .Where(x => x.FileName == name)
                 .SingleOrDefaultAsync();
             if (storage == null) throw new Exception($"Not found file with name ${name}!");
 
-            return mapper.Map<FileInfoDto>(storage);   
+            return mapper.Map<UploadDto>(storage);   
         }
 
-        public async Task<ICollection<FileInfoDto>> GetAllAsync(string key)
+        public async Task<ICollection<UploadDto>> GetAllUploadsAsync(string key)
         {
             if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
 
-            var storages = await context.Storages.ToListAsync();
+            var storages = await context.Uploads.ToListAsync();
 
-            return mapper.Map<ICollection<FileInfoDto>>(storages);
+            return mapper.Map<ICollection<UploadDto>>(storages);
         }
 
-        public async Task<ICollection<FileInfoDto>> GetByUserAsync(string userId, string key)
+        public async Task<ICollection<UploadDto>> GetUploadsByUserAsync(string userId, string key)
         {
             if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
 
-            var storages = await context.Storages
+            var storages = await context.Uploads
                 .Where(x => x.UserId == userId)
                 .ToListAsync();
 
-            return mapper.Map<ICollection<FileInfoDto>>(storages);
+            return mapper.Map<ICollection<UploadDto>>(storages);
         }
 
-        public async Task<ICollection<FileInfoDto>> GetByMimeAsync(string type, string key)
+        public async Task<ICollection<UploadDto>> GetUploadsByMimeAsync(string type, string key)
         {
             if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
 
-            var storages = await context.Storages
+            var storages = await context.Uploads
                 .Where(x => x.MimeType == type)
                 .ToListAsync();
 
-            return mapper.Map<ICollection<FileInfoDto>>(storages);
+            return mapper.Map<ICollection<UploadDto>>(storages);
         }
     }
 }

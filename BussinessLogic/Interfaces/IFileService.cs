@@ -11,10 +11,10 @@ namespace BussinessLogic.Interfaces
     {
         Task<string> UploadFileAsync(UploadFileDto model);
         Task DeleteFileAsync(DeleteFileDto model);
-        Task<FileInfoDto> GetFileInfoByIdAsync(string id, string key);
-        Task<FileInfoDto> GetFileInfoByNameAsync(string name, string key);
-        Task<ICollection<FileInfoDto>> GetAllAsync(string key);
-        Task<ICollection<FileInfoDto>> GetByUserAsync(string userId, string key);
-        Task<ICollection<FileInfoDto>> GetByMimeAsync(string type, string key);
+        Task<UploadDto> GetUploadByIdAsync(string id, string key);
+        Task<UploadDto> GetUploadByNameAsync(string name, string key);
+        Task<ICollection<UploadDto>> GetAllUploadsAsync(string key);
+        Task<ICollection<UploadDto>> GetUploadsByUserAsync(string userId, string key);
+        Task<ICollection<UploadDto>> GetUploadsByMimeAsync(string type, string key);
     }
 }

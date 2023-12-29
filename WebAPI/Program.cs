@@ -31,6 +31,9 @@ namespace WebAPI
             Constants.IsDevelopment = builder.Environment.IsDevelopment();
 
             builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<IKeyService, KeyService>();
+            builder.Services.AddScoped<ILoggerService, LoggerService>();
+            builder.Services.AddScoped<IStorageService, StorageService>();
 
             builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

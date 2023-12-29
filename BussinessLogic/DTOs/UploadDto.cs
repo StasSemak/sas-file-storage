@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BussinessLogic.DTOs
 {
-    public class FileInfoDto
+    public class UploadDto
     {
         public string Id { get; set; }
         public string FileName { get; set; }

@@ -1,15 +1,17 @@
-﻿using System;
+﻿using BussinessLogic.Helpers;
+using BussinessLogic.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BussinessLogic.Helpers
+namespace BussinessLogic.Services
 {
-    public class FilesWorker
+    public class StorageService : IStorageService
     {
         private readonly string filesFolder;
-        public FilesWorker()
+        public StorageService()
         {
             filesFolder = Constants.FilesFolderPath;
         }
@@ -22,7 +24,7 @@ namespace BussinessLogic.Helpers
             string base64Prefix = base64.Split(',')[0];
             string savedFileName = Path.GetRandomFileName() + $".{fileExtension}";
 
-            if(base64Prefix.Contains("image"))
+            if (base64Prefix.Contains("image"))
             {
                 try
                 {
@@ -54,7 +56,7 @@ namespace BussinessLogic.Helpers
 
         public async Task RemoveFileAsync(string filename)
         {
-            return Task.Run(() =>
+            await Task.Run(() =>
             {
                 try
                 {

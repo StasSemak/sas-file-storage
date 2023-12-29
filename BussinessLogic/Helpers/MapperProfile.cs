@@ -12,7 +12,8 @@ namespace BussinessLogic.Helpers
     {
         public MapperProfile() 
         {
-            CreateMap<Storage, FileInfoDto>();
+            CreateMap<Upload, UploadDto>();
+            CreateMap<Log, LogDto>();
         }
     }
 }

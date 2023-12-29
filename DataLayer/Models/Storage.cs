@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Models
 {
-    public class Storage
+    public class Upload
     {
         public string Id { get; set; }
         public string FileName { get; set; }

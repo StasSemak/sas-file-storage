@@ -45,11 +45,11 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("info/{id}")]
-        public async Task<IActionResult> GetFileInfoById([FromRoute] string id, [FromQuery] string key)
+        public async Task<IActionResult> GetUploadById([FromRoute] string id, [FromQuery] string key)
         {
             try
             {
-                var info = await service.GetFileInfoByIdAsync(id, key);
+                var info = await service.GetUploadByIdAsync(id, key);
                 return Ok(info);
             }
             catch (Exception ex)
@@ -59,11 +59,11 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("info/{name}")]
-        public async Task<IActionResult> GetFileInfoByName([FromRoute] string name, [FromQuery] string key)
+        public async Task<IActionResult> GetUploadByName([FromRoute] string name, [FromQuery] string key)
         {
             try
             {
-                var info = await service.GetFileInfoByNameAsync(name, key);
+                var info = await service.GetUploadByNameAsync(name, key);
                 return Ok(info);
             }
             catch (Exception ex)
@@ -77,7 +77,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var uploads = await service.GetAllAsync(key);
+                var uploads = await service.GetAllUploadsAsync(key);
                 return Ok(uploads);
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var uploads = await service.GetByUserAsync(id, key);
+                var uploads = await service.GetUploadsByUserAsync(id, key);
                 return Ok(uploads);
             }
             catch (Exception ex)
@@ -105,7 +105,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                var uploads = await service.GetByMimeAsync(type, key);
+                var uploads = await service.GetUploadsByMimeAsync(type, key);
                 return Ok(uploads);
             }
             catch (Exception ex)
