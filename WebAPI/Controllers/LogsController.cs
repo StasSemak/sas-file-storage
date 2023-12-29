@@ -1,4 +1,5 @@
 ﻿using BussinessLogic.Enums;
+using BussinessLogic.Exceptions;
 using BussinessLogic.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,8 @@ namespace WebAPI.Controllers
             }
             catch (Exception ex)
             {
+                if (ex is UnauthorizedException) return Unauthorized(new { error = "Unauthorized" });
+                if (ex is InternalServerException) return StatusCode(500, new { error = "Internal error" });
                 return BadRequest(new { error = ex.Message });
             }
         }

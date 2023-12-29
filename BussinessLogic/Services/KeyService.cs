@@ -16,7 +16,8 @@ namespace BussinessLogic.Services
         {
             if(Constants.IsDevelopment)
             {
-                keysFolderPath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory().ToString()).FullName, "Keys");
+                string root = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
+                keysFolderPath = Path.Combine(root, "BussinessLogic", "Keys");
             }
             else keysFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Keys");
         }

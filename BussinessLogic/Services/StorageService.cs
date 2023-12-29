@@ -1,4 +1,5 @@
-﻿using BussinessLogic.Helpers;
+﻿using BussinessLogic.Exceptions;
+using BussinessLogic.Helpers;
 using BussinessLogic.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace BussinessLogic.Services
 
         public async Task<string> SaveFileAsync(string filename, string base64)
         {
-            if (string.IsNullOrWhiteSpace(base64)) throw new Exception("Unable to convert empty string!");
+            if (string.IsNullOrWhiteSpace(base64)) throw new BadRequestException("Unable to save empty file!");
 
             string fileExtension = filename.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
             string base64Prefix = base64.Split(',')[0];
@@ -32,7 +33,7 @@ namespace BussinessLogic.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Error saving image {savedFileName}! {ex.Message}");
+                    throw new InternalServerException($"Error saving image {savedFileName}! {ex.Message}");
                 }
             }
             else
@@ -47,7 +48,7 @@ namespace BussinessLogic.Services
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Error saving file {savedFileName}! {ex.Message}");
+                    throw new InternalServerException($"Error saving file {savedFileName}! {ex.Message}");
                 }
             }
 
@@ -65,10 +66,11 @@ namespace BussinessLogic.Services
                     {
                         File.Delete(file);
                     }
+                    else throw new BadRequestException($"File {filename} not exists!");
                 }
                 catch
                 {
-                    throw new Exception($"Error removing file {filename}!");
+                    throw;
                 }
             });
         }

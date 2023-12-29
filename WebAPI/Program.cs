@@ -67,6 +67,7 @@ namespace WebAPI
 
             app.UseAuthorization();
 
+            Console.WriteLine("DEVELOPMENT MODE: " + Constants.IsDevelopment);
 
             app.MapControllers();
 

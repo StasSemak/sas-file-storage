@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BussinessLogic.DTOs;
+using BussinessLogic.Exceptions;
 using BussinessLogic.Helpers;
 using BussinessLogic.Interfaces;
 using DataLayer.Data;
@@ -37,17 +38,17 @@ namespace BussinessLogic.Services
             {
                 if(!await keyService.IsSecurityKeyValidAsync(model.SecurityKey))
                 {
-                    throw new UnauthorizedAccessException();
+                    throw new UnauthorizedException();
                 }
 
                 string filename = await storageService.SaveFileAsync(model.FileName, model.Base64);
 
-                var storage = new Upload();
-                storage.FileName = filename;
-                storage.UserId = model.UserId;
-                storage.MimeType = model.FileName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
+                var upload = new Upload();
+                upload.FileName = filename;
+                upload.UserId = model.UserId;
+                upload.MimeType = model.FileName.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
 
-                await context.Uploads.AddAsync(storage);
+                await context.Uploads.AddAsync(upload);
 
                 await loggerService.LogSuccessAsync(model.UserId, filename);
 
@@ -66,13 +67,13 @@ namespace BussinessLogic.Services
             {
                 if(!string.IsNullOrWhiteSpace(model.SecurityKey))
                 {
-                    if(!await keyService.IsSecurityKeyValidAsync(model.SecurityKey)) throw new UnauthorizedAccessException();
+                    if(!await keyService.IsSecurityKeyValidAsync(model.SecurityKey)) throw new UnauthorizedException();
 
                     var storage = await context.Uploads
                         .Where(x => x.UserId == model.UserId)
                         .Where(x => x.FileName == model.FileName)
                         .SingleOrDefaultAsync();
-                    if (storage == null) throw new Exception($"File ${model.FileName} not found!");
+                    if (storage == null) throw new BadRequestException($"File ${model.FileName} not found!");
 
                     await storageService.RemoveFileAsync(model.FileName);
                     context.Uploads.Remove(storage);
@@ -82,12 +83,12 @@ namespace BussinessLogic.Services
                 }
                 else if(!string.IsNullOrWhiteSpace(model.AdminKey)) 
                 {
-                    if (!await keyService.IsAdminKeyValidAsync(model.AdminKey)) throw new UnauthorizedAccessException();
+                    if (!await keyService.IsAdminKeyValidAsync(model.AdminKey)) throw new UnauthorizedException();
 
                     var storage = await context.Uploads
                         .Where(x => x.FileName == model.FileName)
                         .SingleOrDefaultAsync();
-                    if (storage == null) throw new Exception($"File ${model.FileName} not found!");
+                    if (storage == null) throw new BadRequestException($"File ${model.FileName} not found!");
 
                     await storageService.RemoveFileAsync(model.FileName);
                     context.Uploads.Remove(storage);
@@ -97,7 +98,7 @@ namespace BussinessLogic.Services
                 }
                 else
                 {
-                    throw new UnauthorizedAccessException();
+                    throw new UnauthorizedException();
                 }
             }
             catch (Exception ex)
@@ -109,10 +110,10 @@ namespace BussinessLogic.Services
 
         public async Task<UploadDto> GetUploadByIdAsync(string id, string key)
         {
-            if(!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+            if(!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedException();
 
             var storage = await context.Uploads.FindAsync(id);
-            if (storage == null) throw new Exception($"Not found file with id ${id}!");
+            if (storage == null) throw new BadRequestException($"Not found file with id ${id}!");
 
             return new UploadDto
             {
@@ -126,19 +127,19 @@ namespace BussinessLogic.Services
 
         public async Task<UploadDto> GetUploadByNameAsync(string name, string key)
         {
-            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedException();
 
             var storage = await context.Uploads
                 .Where(x => x.FileName == name)
                 .SingleOrDefaultAsync();
-            if (storage == null) throw new Exception($"Not found file with name ${name}!");
+            if (storage == null) throw new BadRequestException($"Not found file with name ${name}!");
 
             return mapper.Map<UploadDto>(storage);   
         }
 
         public async Task<ICollection<UploadDto>> GetAllUploadsAsync(string key)
         {
-            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedException();
 
             var storages = await context.Uploads.ToListAsync();
 
@@ -147,7 +148,7 @@ namespace BussinessLogic.Services
 
         public async Task<ICollection<UploadDto>> GetUploadsByUserAsync(string userId, string key)
         {
-            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedException();
 
             var storages = await context.Uploads
                 .Where(x => x.UserId == userId)
@@ -158,7 +159,7 @@ namespace BussinessLogic.Services
 
         public async Task<ICollection<UploadDto>> GetUploadsByMimeAsync(string type, string key)
         {
-            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedException();
 
             var storages = await context.Uploads
                 .Where(x => x.MimeType == type)

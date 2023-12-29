@@ -44,7 +44,7 @@ namespace BussinessLogic.Helpers
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Error saving image!\n" + ex.Message);
+                    throw new Exception("Error saving image! " + ex.Message);
                 }
                 return filename;
             });

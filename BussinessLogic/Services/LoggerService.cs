@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BussinessLogic.DTOs;
 using BussinessLogic.Enums;
+using BussinessLogic.Exceptions;
 using BussinessLogic.Interfaces;
 using DataLayer.Data;
 using DataLayer.Models;
@@ -50,7 +51,7 @@ namespace BussinessLogic.Services
 
         public async Task<ICollection<LogDto>> GetLogsAsync(string key, LogsDurationOptions options = LogsDurationOptions.None)
         {
-            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedAccessException();
+            if (!await keyService.IsAdminKeyValidAsync(key)) throw new UnauthorizedException();
 
             var logs = await context.Logs
                 .Where(x => x.Date > GetDateFromOption(options))
