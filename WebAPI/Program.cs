@@ -13,7 +13,10 @@ namespace WebAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            string connStr = builder.Configuration.GetConnectionString("LocalDb");
+            string connStrName;
+            if (builder.Environment.IsDevelopment()) connStrName = "LocalDb";
+            else connStrName = "GlobalDb";
+            string connStr = builder.Configuration.GetConnectionString(connStrName);
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connStr));
 
             string dir;
