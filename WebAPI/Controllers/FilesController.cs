@@ -49,7 +49,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpGet("info/{id}")]
+        [HttpGet("upload/id/{id}")]
         public async Task<IActionResult> GetUploadById([FromRoute] string id, [FromQuery] string key)
         {
             try
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpGet("info/{name}")]
+        [HttpGet("upload/name/{name}")]
         public async Task<IActionResult> GetUploadByName([FromRoute] string name, [FromQuery] string key)
         {
             try
@@ -97,7 +97,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpGet("uploads/{id}")]
+        [HttpGet("uploads/id/{id}")]
         public async Task<IActionResult> GetUploadsByUser([FromRoute]string id, [FromQuery] string key)
         {
             try
@@ -113,7 +113,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [HttpGet("uploads/{type}")]
+        [HttpGet("uploads/type/{type}")]
         public async Task<IActionResult> GetUploadsByType([FromRoute]string type, [FromQuery] string key)
         {
             try
