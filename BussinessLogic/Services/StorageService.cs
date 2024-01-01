@@ -22,37 +22,40 @@ namespace BussinessLogic.Services
             if (string.IsNullOrWhiteSpace(base64)) throw new BadRequestException("Unable to save empty file!");
 
             string fileExtension = filename.Split('.', StringSplitOptions.RemoveEmptyEntries).Last();
-            string base64Prefix = base64.Split(',')[0];
-            string savedFileName = Path.GetRandomFileName() + $".{fileExtension}";
+            string base64Prefix = base64.Split(',')[0];        
 
             if (base64Prefix.Contains("image"))
             {
+                string imageName = Path.GetRandomFileName() + $".{fileExtension}";
                 try
                 {
-                    await ImageWorker.SaveImageAsync(base64, filesFolder, savedFileName, fileExtension);
+                    await ImageWorker.SaveImageAsync(base64, filesFolder, imageName, fileExtension);
+                    return imageName;
                 }
                 catch (Exception ex)
                 {
-                    throw new InternalServerException($"Error saving image {savedFileName}! {ex.Message}");
+                    throw new InternalServerException($"Error saving image {imageName}! {ex.Message}");
                 }
             }
             else
             {
                 try
                 {
-                    string filePath = Path.Combine(filesFolder, savedFileName);
+                    string filePath = Path.Combine(filesFolder, filename);
                     if (base64.Contains(',')) base64 = base64.Split(',')[1];
 
                     byte[] bytes = Convert.FromBase64String(base64);
                     await File.WriteAllBytesAsync(filePath, bytes);
+                    
+                    return filename;
                 }
                 catch (Exception ex)
                 {
-                    throw new InternalServerException($"Error saving file {savedFileName}! {ex.Message}");
+                    throw new InternalServerException($"Error saving file {filename}! {ex.Message}");
                 }
             }
 
-            return savedFileName;
+            
         }
 
         public async Task RemoveFileAsync(string filename)

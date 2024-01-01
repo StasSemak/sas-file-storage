@@ -1,0 +1,66 @@
+const Camera = () => {
+    const [cameraY, setCameraY] = useState<number>(0.5)
+    const [targetY, setTargetY] = useState<number>(0.5)
+    const cameraRef = useRef<THREE.PerspectiveCamera>(null)
+    const [isScrolling, setIsScrolling] = useState<boolean>(false)
+    const [scroll, setScroll] = useState<number>(0)
+    const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+
+    let scrollTimeout: NodeJS.Timeout | null = null;
+
+    const onScroll = useCallback(() => {
+        setIsScrolling(true);
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+        }
+        scrollTimeout = setTimeout(() => {
+          setIsScrolling(false);
+          setTargetY(0.5)
+        }, 200);
+
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY > scroll) {
+          setScrollDirection('down');
+        } else {
+          setScrollDirection('up');
+        }
+
+        console.log("current", currentScrollY);
+        console.log("prev", scroll)
+        console.log(scrollDirection)
+        
+        setScroll(currentScrollY)
+
+        const newY = scrollDirection === 'up' ? 0.4 : 0.6;
+        setTargetY(newY);
+    }, [])
+
+    useEffect(() => {
+        window.addEventListener("scroll", onScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener("scroll", onScroll);
+        }
+    }, [])
+
+    useFrame(() => {
+        if(cameraRef.current) {
+            const deltaY = targetY - cameraY;
+            const easing = 0.1; // Adjust this value for the desired smoothness
+                
+            if (Math.abs(deltaY) > 0.001 || isScrolling) {
+              setCameraY(cameraY + deltaY * easing);
+              cameraRef.current.position.set(0, cameraY, 2);
+            }
+        }
+    })
+
+    return(
+        <PerspectiveCamera 
+            ref={cameraRef}
+            makeDefault 
+            position={[0, 0.5, 2]}
+        />
+    )
+}
